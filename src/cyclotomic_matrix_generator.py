@@ -1,6 +1,7 @@
-import numpy as np
 import sys
 from collections import namedtuple
+
+import numpy as np
 
 
 def power(base, exponent):
@@ -15,6 +16,14 @@ class CyclotomicMatrixGenerator:
         self.k = k
 
     def generate_cyclotomic_matrix(self):
+        """
+        Generates a cyclotomic matrix of order 2l^2 over the field Z_p.
+        :param p: A prime number
+        :param l: A positive integer
+        :param generator: A primitive root of p
+        :param k: A positive integer
+        :return: A 2l^2 x 2l^2 matrix with entries from the set {0, 1, ..., k-1}^2l^2
+        """
         order = 2 * self.l ** 2
         size = order
 
@@ -40,16 +49,16 @@ class CyclotomicMatrixGenerator:
 
 def main():
     if len(sys.argv) < 5:
-        print("Please provide the values of p, l, γ, k as command line arguments.")
+        print("Please provide the values of p, l, generator, k as command line arguments.")
         return
 
     p = int(sys.argv[1])
     l = int(sys.argv[2])
-    γ = int(sys.argv[3])
+    generator = int(sys.argv[3])
     k = int(sys.argv[4])
 
-    generator = CyclotomicMatrixGenerator(p, l, γ, k)
-    matrix = generator.generate_cyclotomic_matrix()
+    cmg = CyclotomicMatrixGenerator(p, l, generator, k)
+    matrix = cmg.generate_cyclotomic_matrix()
     for row in matrix:
         for entry in row:
             print(f"{entry.n:2}", end=" ")
