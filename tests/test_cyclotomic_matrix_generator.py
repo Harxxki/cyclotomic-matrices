@@ -1,6 +1,6 @@
 import numpy as np
 from collections import namedtuple
-from cyclotomic_matrix_generator import CyclotomicMatrixGenerator
+from src.cyclotomic_matrix_generator import CyclotomicMatrixGenerator
 
 
 def test_generate_cyclotomic_matrix():
