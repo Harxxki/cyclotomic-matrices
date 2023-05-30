@@ -8,14 +8,15 @@ def power(base, exponent):
     return base ** exponent
 
 
-class CyclotomicMatrixGenerator:
+class CyclotomicMatrix:
     def __init__(self, p, l, generator, k):
         self.p = p
         self.l = l
         self.generator = generator
         self.k = k
+        self.matrix = self._generate()
 
-    def generate_cyclotomic_matrix(self):
+    def _generate(self):
         """
         Generates a cyclotomic matrix of order 2l^2 over the field Z_p.
         :param p: A prime number
@@ -41,10 +42,29 @@ class CyclotomicMatrixGenerator:
                     for t in range(self.k):
                         p1 = 2 * self.l ** 2 * s + arr[a][b].l
                         p2 = 2 * self.l ** 2 * t + arr[a][b].m
-                        if (power(self.generator, p1) + 1 - power(self.generator, p2)) % self.p == 0:
+                        if (power(self.generator, p1) + 1 - power(self.generator,
+                                                                  p2)) % self.p == 0:
                             count += 1
                 arr[a][b] = arr[a][b]._replace(n=count)
         return arr
+
+    def _convert_cyclotomic_matrix_to_int_matrix(self):
+        if self.matrix is None:
+            raise ValueError("Matrix has not been generated yet.")
+
+        size = 2 * self.l ** 2
+        arr = np.empty((size, size), dtype=int)
+
+        for a in range(size):
+            for b in range(size):
+                arr[a][b] = self.matrix[a][b].n
+
+        return arr
+
+    def get(self, only_n=False):
+        if only_n:
+            return self._convert_cyclotomic_matrix_to_int_matrix()
+        return self.matrix
 
 
 def main():
@@ -57,11 +77,11 @@ def main():
     generator = int(sys.argv[3])
     k = int(sys.argv[4])
 
-    cmg = CyclotomicMatrixGenerator(p, l, generator, k)
-    matrix = cmg.generate_cyclotomic_matrix()
+    cmg = CyclotomicMatrix(p, l, generator, k)
+    matrix = cmg.get(only_n=True)
     for row in matrix:
         for entry in row:
-            print(f"{entry.n:2}", end=" ")
+            print(f"{entry:2}", end=" ")
         print()
 
 
