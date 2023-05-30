@@ -1,7 +1,7 @@
 import sys
 
-from src.cyclotomic_matrix_generator import CyclotomicMatrixGenerator
-from src.message_matrix_converter import MessageMatrixConverter
+from src.cyclotomic_matrix import CyclotomicMatrix
+from src.matrix_converter import MatrixConverter
 
 
 def main():
@@ -16,8 +16,8 @@ def main():
     message_str = sys.argv[5]
 
     # Convert the message string to a message matrix
-    mmc = MessageMatrixConverter(l)
-    message_matrix = mmc.str_to_matrix(message_str)
+    mc = MatrixConverter(l)
+    message_matrix = mc.str_to_matrix(message_str)
     print("Message Matrix:")
     for row in message_matrix:
         for entry in row:
@@ -25,13 +25,14 @@ def main():
         print()
 
     # Generate the cyclotomic matrix
-    cmg = CyclotomicMatrixGenerator(p, l, generator, k)
-    cyclotomic_matrix = cmg.generate_cyclotomic_matrix()
+    cm = CyclotomicMatrix(p, l, generator, k)
+    cyclotomic_matrix = cm.get(only_n=True)
     print("Cyclotomic Matrix:")
     for row in cyclotomic_matrix:
         for entry in row:
-            print(f"{entry.n:2}", end=" ")
+            print(f"{entry:2}", end=" ")
         print()
+
 
 if __name__ == "__main__":
     main()

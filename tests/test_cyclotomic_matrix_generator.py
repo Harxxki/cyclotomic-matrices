@@ -1,10 +1,10 @@
 import numpy as np
 from collections import namedtuple
-from src.cyclotomic_matrix_generator import CyclotomicMatrixGenerator
+from src.cyclotomic_matrix import CyclotomicMatrix
 
 
 def test_generate_cyclotomic_matrix():
-    generator = CyclotomicMatrixGenerator(p=17, l=2, generator=3, k=2)
+    generator = CyclotomicMatrix(p=17, l=2, generator=3, k=2)
     matrix = generator.generate_cyclotomic_matrix()
 
     expected_output = [

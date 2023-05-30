@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class MessageMatrixConverter:
+class MatrixConverter:
     def __init__(self, l):
         self.l = l
 
