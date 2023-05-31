@@ -2,15 +2,33 @@ import sys
 import pickle
 import datetime
 
+import numpy as np
+
 from src.cyclotomic_matrix import CyclotomicMatrix
 from src.matrix_converter import MatrixConverter
-from utils import print_matrix
+from src.utils import print_matrix
+from typing import Tuple, Union
 
 
-def encrypt_message(p, l, generator, k, message_str):
-    # Convert the message string to a message matrix
+def encrypt_message(p: int, l: int, generator: int, k: int,
+                    message_input: Union[str, np.ndarray]) -> Tuple[np.ndarray, str]:
+    """
+    Encrypt a message using the cyclotomic matrix.
+    :param p:
+    :param l:
+    :param generator:
+    :param k:
+    :param message_input: plaintext or message matrix
+    :return:
+    """
+    # Convert the message input to a message matrix
     mc = MatrixConverter(l)
-    message_matrix = mc.str_to_matrix(message_str)
+    if isinstance(message_input, str):
+        message_matrix = mc.str_to_matrix(message_input)
+    elif isinstance(message_input, np.ndarray):
+        message_matrix = message_input
+    else:
+        raise TypeError("message_input must be either a string or a numpy ndarray")
 
     # Generate the cyclotomic matrix
     cm = CyclotomicMatrix(p, l, generator, k)
