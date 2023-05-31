@@ -1,5 +1,5 @@
 import numpy as np
-from find_generators import find_generators
+from src.find_generators import find_generators
 
 
 def print_matrix(matrix: np.ndarray, name: str) -> None:
