@@ -4,8 +4,8 @@ from src.cyclotomic_matrix import CyclotomicMatrix
 
 
 def test_generate_cyclotomic_matrix():
-    generator = CyclotomicMatrix(p=17, l=2, generator=3, k=2)
-    matrix = generator.generate_cyclotomic_matrix()
+    cm = CyclotomicMatrix(p=17, l=2, generator=3, k=2)
+    matrix = cm.get(only_n=True)
 
     expected_output = [
         [0, 0, 0, 0, 0, 0, 1, 0],
@@ -18,17 +18,17 @@ def test_generate_cyclotomic_matrix():
         [0, 0, 0, 1, 0, 1, 0, 0]
     ]
 
-    print("Expected Output:")
+    print("\nExpected Output:")
     for row in expected_output:
         print(row)
 
     print("\nActual Output:")
     for row in matrix:
-        print([entry.n for entry in row])
+        print(row)
 
     for i in range(len(expected_output)):
         for j in range(len(expected_output[0])):
-            assert matrix[i][j].n == expected_output[i][j]
+            assert matrix[i][j] == expected_output[i][j]
 
 if __name__ == "__main__":
     test_generate_cyclotomic_matrix()
