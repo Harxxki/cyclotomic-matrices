@@ -1,4 +1,6 @@
 import sys
+import pickle
+import datetime
 
 from src.cyclotomic_matrix import CyclotomicMatrix
 from src.matrix_converter import MatrixConverter
@@ -27,12 +29,17 @@ def main():
     print_matrix(cyclotomic_matrix, "Cyclotomic Matrix")
 
     # Encrypt the message
-    encrypted_matrix = cyclotomic_matrix @ message_matrix
-    print_matrix(encrypted_matrix, "Encrypted Matrix")
+    cipher_matrix = cyclotomic_matrix @ message_matrix
+    print_matrix(cipher_matrix, "Cypher Matrix")
 
     # Convert the encrypted matrix to a string
-    encrypted_message = mc.matrix_to_str(encrypted_matrix)
-    print(f"Encrypted Message: {encrypted_message}")
+    cipher_str = mc.matrix_to_str(cipher_matrix)
+    print(f"Ciphertext: {cipher_str}")
+
+    # Save the variables to a file
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    with open(f"dist/{timestamp}_cipher_data.pkl", "wb") as f:
+        pickle.dump((p, l, k, generator, cipher_matrix, cipher_str), f)
 
 
 if __name__ == "__main__":
