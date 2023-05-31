@@ -39,7 +39,7 @@ class CyclotomicMatrix:
 
         return arr
 
-    def _calc(self) -> None:
+    def _calc(self):
         """
         Calculates the entries of the cyclotomic matrix.
         """
@@ -50,9 +50,10 @@ class CyclotomicMatrix:
                     for t in range(self.k):
                         p1 = 2 * self.l ** 2 * s + self.matrix[a][b].l
                         p2 = 2 * self.l ** 2 * t + self.matrix[a][b].m
-                        if (power(self.generator, p1) + 1 - power(self.generator, p2)) % self.p == 0:
-                            count += 1
+                        is_zero = (power(self.generator, p1) + 1 - power(self.generator, p2)) % self.p == 0
+                        count += np.sum(is_zero)
                 self.matrix[a][b] = self.matrix[a][b]._replace(n=count)
+        return self
 
     def _convert_cyclotomic_matrix_to_int_matrix(self) -> np.ndarray:
         if self.matrix is None:
@@ -71,6 +72,17 @@ class CyclotomicMatrix:
         if only_n:
             return self._convert_cyclotomic_matrix_to_int_matrix()
         return self.matrix
+
+    def mul(self, r_0):
+        size = 2 * self.l ** 2
+        Entry = namedtuple('Entry', 'l m n')  # Re-introduce the namedtuple here
+        for a in range(size):
+            for b in range(size):
+                l, m, n = self.matrix[a][b]
+                l_new = (l * r_0) % self.p
+                m_new = (m * r_0) % self.p
+                self.matrix[a][b] = Entry(l_new, m_new, n)  # Use Entry namedtuple here
+        return self
 
 
 def main():
