@@ -21,5 +21,6 @@ def secret_key_expansion(p: int, l: int, r_0: int, generator: int):
     :param generator: A primitive root of p
     :return: generators: list of
     """
+    # TODO implementation Algorithm 1
     generators = find_generators(p)
     return generators

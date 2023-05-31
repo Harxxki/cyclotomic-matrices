@@ -3,7 +3,7 @@ from collections import namedtuple
 from src.cyclotomic_matrix import CyclotomicMatrix
 
 
-def test_generate_cyclotomic_matrix():
+def test_cyclotomic_matrix():
     cm = CyclotomicMatrix(p=17, l=2, generator=3, k=2)
     matrix = cm.get(only_n=True)
 
