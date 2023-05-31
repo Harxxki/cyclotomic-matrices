@@ -4,10 +4,11 @@ def generators(n):
     for a in s:
         g = set()
         for x in s:
-            g.add((a**x) % n)
+            g.add((a ** x) % n)
         if g == s:
             results.append(a)
     return results
+
 
 for i in range(100):
     gens = generators(i)
