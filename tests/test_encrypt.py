@@ -1,4 +1,5 @@
 import numpy as np
+from src.utils import print_matrix
 from src.encrypt import encrypt_message
 
 
@@ -30,5 +31,9 @@ def test_encrypt_message():
     ])
 
     cipher_matrix, _ = encrypt_message(p, l, generator, k, message_matrix)
+
+    print('\n')
+    print_matrix(expected_cipher_matrix, 'Expected Output')
+    print_matrix(cipher_matrix, 'Actual Output')
 
     np.testing.assert_array_equal(cipher_matrix, expected_cipher_matrix)
