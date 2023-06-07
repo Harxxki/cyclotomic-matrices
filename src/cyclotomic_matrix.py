@@ -42,6 +42,7 @@ class CyclotomicMatrix:
     def _calc(self):
         """
         Calculates the entries of the cyclotomic matrix.
+        基本的には初期化のタイミングのみで呼び出すが, 主に復号において (l, m) の値を変更した場合に再度計算をかける必要があるので, その際には外部から呼び出す.
         """
         for a in range(self.size):
             for b in range(self.size):

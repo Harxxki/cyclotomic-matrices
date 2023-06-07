@@ -36,6 +36,10 @@ def encrypt_message(p: int, l: int, generator: int, k: int,
     cm = CyclotomicMatrix(p, l, generator, k)
     cyclotomic_matrix = cm.get(only_n=True)
     print_matrix(cyclotomic_matrix, "Cyclotomic Matrix")
+    # Check if the matrix is invertible
+    if np.linalg.det(cyclotomic_matrix) == 0:
+        print("Error: The cyclotomic matrix is not invertible.")
+        sys.exit(1)
 
     # Encrypt the message
     cipher_matrix = cyclotomic_matrix @ message_matrix
