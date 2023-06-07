@@ -54,12 +54,17 @@ def main():
     if args.cipher_str:
         cipher_str = args.cipher_str
 
+    # TODO: ここでランダムに選んでるのがまずそう. 論文のCACの例で選び方が記述してあったのでそれを参考にする.
+    # gamma' = 11, gamma'' = 3
+    # 3^7 (= gamma''^n) = 11 (mod 17) (= 11 (mod p)) のように選んでいる.
     random_generator = random.choice(find_generators(p))
-    cm = CyclotomicMatrix(p, l, generator, k).mul(args.r_0)._calc()
+    cm = CyclotomicMatrix(p, l, random_generator, k).mul(args.r_0)._calc()
     cyclotomic_matrix = cm.get(only_n=True)
     print_matrix(cyclotomic_matrix, "Cyclotomic Matrix")
 
     mc = MatrixConverter(l)
+    # TODO: raise LinAlgError("Singular matrix")
+    # TODO: 逆行列の計算の仕方を考える. 計算過程でmod pをとる.
     inverse_cyclotomic_matrix = np.linalg.inv(cyclotomic_matrix)
     print_matrix(inverse_cyclotomic_matrix, "Inverse Cyclotomic Matrix (Z)")
 

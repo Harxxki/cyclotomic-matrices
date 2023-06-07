@@ -30,12 +30,16 @@ def encrypt_message(p: int, l: int, generator: int, k: int,
     else:
         raise TypeError("message_input must be either a string or a numpy ndarray")
 
+    print_matrix(message_matrix, "Message Matrix")
+
     # Generate the cyclotomic matrix
     cm = CyclotomicMatrix(p, l, generator, k)
     cyclotomic_matrix = cm.get(only_n=True)
+    print_matrix(cyclotomic_matrix, "Cyclotomic Matrix")
 
     # Encrypt the message
     cipher_matrix = cyclotomic_matrix @ message_matrix
+    print_matrix(cipher_matrix, "Cipher Matrix")
 
     # Convert the encrypted matrix to a string
     cipher_str = mc.matrix_to_str(cipher_matrix)
@@ -63,7 +67,7 @@ def main():
 
     cipher_matrix, cipher_str = encrypt_message(p, l, generator, k, message_str)
 
-    print_matrix(cipher_matrix, "Cypher Matrix")
+    print_matrix(cipher_matrix, "Cipher Matrix")
     print(f"Ciphertext: {cipher_str}")
 
     save_variables_to_file(p, l, k, generator, cipher_matrix, cipher_str)
