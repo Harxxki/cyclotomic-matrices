@@ -8,6 +8,7 @@ import numpy as np
 def power(base: int, exponent: int) -> int:
     return base ** exponent
 
+
 class CyclotomicMatrix:
     def __init__(self, p: int, l: int, generator: int, k: int):
         """
@@ -79,7 +80,6 @@ class CyclotomicMatrix:
         else:
             raise ValueError(f"Invalid format: {matrix_format}")
 
-
     def _convert_cyclotomic_matrix_to_pair_matrix(self) -> np.ndarray:
         if self.matrix is None:
             raise ValueError("Matrix has not been generated yet.")
@@ -92,22 +92,16 @@ class CyclotomicMatrix:
                 arr[a][b] = (self.matrix[a][b].l, self.matrix[a][b].m)
 
         return arr
+
     def mul(self, r_0):
         size = 2 * self.l ** 2
-        Entry = namedtuple('Entry', 'l m n')  # Re-introduce the namedtuple here
         for a in range(size):
             for b in range(size):
                 l, m, n = self.matrix[a][b]
                 l_new = (l * r_0) % self.order
                 m_new = (m * r_0) % self.order
-                self.matrix[a][b] = Entry(l_new, m_new, n)  # Use Entry namedtuple here
+                self.matrix[a][b] = self.matrix[a][b]._replace(l=l_new, m=m_new)
         return self
-
-    # def inverse(self):
-    #     """
-    #     ガウス-ジョルダンの消去法を使用して、このサイクロトミック行列の逆行列を計算する.
-    #     """
-    #     return cyclo_matrix_inverse(self.matrix, self.p)
 
 
 def main():
