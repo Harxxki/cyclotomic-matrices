@@ -63,7 +63,7 @@ def main():
     encrypt_generator = generator
     decrypt_generator = pow(encrypt_generator, r_0, p)
     cm = CyclotomicMatrix(p, l, decrypt_generator, k).mul(args.r_0)._calc()
-    cyclotomic_matrix = cm.get(only_n=True)
+    cyclotomic_matrix = cm.get(matrix_format="calculated")
     print_matrix(cyclotomic_matrix, "Cyclotomic Matrix")
 
     mc = MatrixConverter(l)

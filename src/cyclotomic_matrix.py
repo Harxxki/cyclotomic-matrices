@@ -8,7 +8,6 @@ import numpy as np
 def power(base: int, exponent: int) -> int:
     return base ** exponent
 
-
 class CyclotomicMatrix:
     def __init__(self, p: int, l: int, generator: int, k: int):
         """
@@ -51,7 +50,8 @@ class CyclotomicMatrix:
                     for t in range(self.k):
                         p1 = 2 * self.l ** 2 * s + self.matrix[a][b].l
                         p2 = 2 * self.l ** 2 * t + self.matrix[a][b].m
-                        is_zero = (power(self.generator, p1) + 1 - power(self.generator, p2)) % self.p == 0
+                        is_zero = (power(self.generator, p1) + 1 - power(self.generator,
+                                                                         p2)) % self.p == 0
                         count += np.sum(is_zero)
                 self.matrix[a][b] = self.matrix[a][b]._replace(n=count)
         return self
@@ -69,21 +69,45 @@ class CyclotomicMatrix:
 
         return arr
 
-    def get(self, only_n=False) -> Union[np.ndarray, int]:
-        if only_n:
+    def get(self, matrix_format="all") -> Union[np.ndarray, int]:
+        if matrix_format == "all":
+            return self.matrix
+        elif matrix_format == "calculated":
             return self._convert_cyclotomic_matrix_to_int_matrix()
-        return self.matrix
+        elif matrix_format == "pair":
+            return self._convert_cyclotomic_matrix_to_pair_matrix()
+        else:
+            raise ValueError(f"Invalid format: {matrix_format}")
 
+
+    def _convert_cyclotomic_matrix_to_pair_matrix(self) -> np.ndarray:
+        if self.matrix is None:
+            raise ValueError("Matrix has not been generated yet.")
+
+        size = 2 * self.l ** 2
+        arr = np.empty((size, size), dtype=object)
+
+        for a in range(size):
+            for b in range(size):
+                arr[a][b] = (self.matrix[a][b].l, self.matrix[a][b].m)
+
+        return arr
     def mul(self, r_0):
         size = 2 * self.l ** 2
         Entry = namedtuple('Entry', 'l m n')  # Re-introduce the namedtuple here
         for a in range(size):
             for b in range(size):
                 l, m, n = self.matrix[a][b]
-                l_new = (l * r_0) % self.p
-                m_new = (m * r_0) % self.p
+                l_new = (l * r_0) % self.order
+                m_new = (m * r_0) % self.order
                 self.matrix[a][b] = Entry(l_new, m_new, n)  # Use Entry namedtuple here
         return self
+
+    # def inverse(self):
+    #     """
+    #     ガウス-ジョルダンの消去法を使用して、このサイクロトミック行列の逆行列を計算する.
+    #     """
+    #     return cyclo_matrix_inverse(self.matrix, self.p)
 
 
 def main():
@@ -97,7 +121,7 @@ def main():
     k = int(sys.argv[4])
 
     cmg = CyclotomicMatrix(p, l, generator, k)
-    matrix = cmg.get(only_n=True)
+    matrix = cmg.get(matrix_format="calculated")
     for row in matrix:
         for entry in row:
             print(f"{entry:2}", end=" ")

@@ -9,7 +9,7 @@ def test_cyclotomic_matrix():
     :return:
     """
     cm = CyclotomicMatrix(p=17, l=2, generator=3, k=2)
-    matrix = cm.get(only_n=True)
+    matrix = cm.get(matrix_format="calculated")
 
     expected_output = np.array([
         [0, 0, 0, 0, 0, 0, 1, 0],

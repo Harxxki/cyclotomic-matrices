@@ -34,7 +34,7 @@ def encrypt_message(p: int, l: int, generator: int, k: int,
 
     # Generate the cyclotomic matrix
     cm = CyclotomicMatrix(p, l, generator, k)
-    cyclotomic_matrix = cm.get(only_n=True)
+    cyclotomic_matrix = cm.get(matrix_format="calculated")
     print_matrix(cyclotomic_matrix, "Cyclotomic Matrix")
     # Check if the matrix is invertible
     if np.linalg.det(cyclotomic_matrix) == 0:
