@@ -3,10 +3,21 @@ from collections import namedtuple
 from typing import Union
 
 import numpy as np
+from numpy import ndarray
+from numpy.linalg import LinAlgError, inv
 
 
 def power(base: int, exponent: int) -> int:
     return base ** exponent
+
+
+def _is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
 
 
 class CyclotomicMatrix:
@@ -17,6 +28,11 @@ class CyclotomicMatrix:
         :param generator: A primitive root of p
         :param k: A positive integer
         """
+        if not _is_prime(p):
+            raise ValueError("p should be a prime number.")
+        if l <= 0 or k <= 0:
+            raise ValueError("l and k should be positive integers.")
+
         self.p = p
         self.l = l
         self.generator = generator
@@ -42,6 +58,7 @@ class CyclotomicMatrix:
     def _calc(self):
         """
         Calculates the entries of the cyclotomic matrix.
+        基本的には初期化のタイミングのみで呼び出すが, 主に復号において (l, m) の値を変更した場合に再度計算をかける必要があるので, その際には外部から呼び出す.
         """
         for a in range(self.size):
             for b in range(self.size):
@@ -50,7 +67,8 @@ class CyclotomicMatrix:
                     for t in range(self.k):
                         p1 = 2 * self.l ** 2 * s + self.matrix[a][b].l
                         p2 = 2 * self.l ** 2 * t + self.matrix[a][b].m
-                        is_zero = (power(self.generator, p1) + 1 - power(self.generator, p2)) % self.p == 0
+                        is_zero = (power(self.generator, p1) + 1 - power(self.generator,
+                                                                         p2)) % self.p == 0
                         count += np.sum(is_zero)
                 self.matrix[a][b] = self.matrix[a][b]._replace(n=count)
         return self
@@ -68,21 +86,67 @@ class CyclotomicMatrix:
 
         return arr
 
-    def get(self, only_n=False) -> Union[np.ndarray, int]:
-        if only_n:
+    def get(self, matrix_format="all") -> Union[np.ndarray, int]:
+        if matrix_format == "all":
+            return self.matrix
+        elif matrix_format == "calculated":
             return self._convert_cyclotomic_matrix_to_int_matrix()
-        return self.matrix
+        elif matrix_format == "pair":
+            return self._convert_cyclotomic_matrix_to_pair_matrix()
+        else:
+            raise ValueError(f"Invalid format: {matrix_format}")
+
+    def _convert_cyclotomic_matrix_to_pair_matrix(self) -> np.ndarray:
+        if self.matrix is None:
+            raise ValueError("Matrix has not been generated yet.")
+
+        size = 2 * self.l ** 2
+        arr = np.empty((size, size), dtype=object)
+
+        for a in range(size):
+            for b in range(size):
+                arr[a][b] = (self.matrix[a][b].l, self.matrix[a][b].m)
+
+        return arr
 
     def mul(self, r_0):
         size = 2 * self.l ** 2
-        Entry = namedtuple('Entry', 'l m n')  # Re-introduce the namedtuple here
+        Entry = namedtuple('Entry', 'l m n')
         for a in range(size):
             for b in range(size):
                 l, m, n = self.matrix[a][b]
-                l_new = (l * r_0) % self.p
-                m_new = (m * r_0) % self.p
-                self.matrix[a][b] = Entry(l_new, m_new, n)  # Use Entry namedtuple here
+                l_new = (l * r_0) % self.order
+                m_new = (m * r_0) % self.order
+                self.matrix[a][b] = Entry(l_new, m_new, n)
         return self
+
+    def inv(self) -> ndarray | None:
+        """
+        逆行列の計算を行う.
+
+        Returns:
+            np.ndarray: (e, e)の逆行列. 要素はint.
+        """
+        # 最新の状態に更新
+        self._calc()
+
+        # nのみを抽出して新たな行列を作成
+        n_matrix = np.empty((self.size, self.size), dtype=int)
+        for a in range(self.size):
+            for b in range(self.size):
+                n_matrix[a][b] = self.matrix[a][b].n
+
+        # 正則行列であることを確認
+        assert np.linalg.det(n_matrix) != 0, "The matrix is not regular."
+
+        # 逆行列を計算
+        try:
+            inv_matrix = inv(n_matrix)
+        except LinAlgError:
+            print("The matrix is not invertible.")
+            return None
+
+        return inv_matrix
 
 
 def main():
@@ -96,7 +160,7 @@ def main():
     k = int(sys.argv[4])
 
     cmg = CyclotomicMatrix(p, l, generator, k)
-    matrix = cmg.get(only_n=True)
+    matrix = cmg.get(matrix_format="calculated")
     for row in matrix:
         for entry in row:
             print(f"{entry:2}", end=" ")
