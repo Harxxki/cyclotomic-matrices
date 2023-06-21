@@ -8,11 +8,11 @@ from src.cyclotomic_matrix import CyclotomicMatrix
 
 from pprint import pprint
 
+
 def pretty_print_nparray(arr):
     """Pretty print a numpy array with namedtuple elements."""
     for row in arr:
         print(' '.join(f"({item.l}, {item.m}, {item.n})" for item in row))
-
 
 
 def test_cyclo_matrix_inverse():
