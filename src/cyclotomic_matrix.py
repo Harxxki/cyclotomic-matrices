@@ -3,6 +3,8 @@ from collections import namedtuple
 from typing import Union
 
 import numpy as np
+from numpy import ndarray
+from numpy.linalg import LinAlgError, inv
 
 
 def power(base: int, exponent: int) -> int:
@@ -116,6 +118,34 @@ class CyclotomicMatrix:
                 m_new = (m * r_0) % self.order
                 self.matrix[a][b] = Entry(l_new, m_new, n)
         return self
+
+    def inv(self) -> ndarray | None:
+        """
+        逆行列の計算を行う.
+
+        Returns:
+            np.ndarray: (e, e)の逆行列. 要素はint.
+        """
+        # 最新の状態に更新
+        self._calc()
+
+        # nのみを抽出して新たな行列を作成
+        n_matrix = np.empty((self.size, self.size), dtype=int)
+        for a in range(self.size):
+            for b in range(self.size):
+                n_matrix[a][b] = self.matrix[a][b].n
+
+        # 正則行列であることを確認
+        assert np.linalg.det(n_matrix) != 0, "The matrix is not regular."
+
+        # 逆行列を計算
+        try:
+            inv_matrix = inv(n_matrix)
+        except LinAlgError:
+            print("The matrix is not invertible.")
+            return None
+
+        return inv_matrix
 
 
 def main():
