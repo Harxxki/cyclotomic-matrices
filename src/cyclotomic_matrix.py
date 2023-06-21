@@ -108,12 +108,13 @@ class CyclotomicMatrix:
 
     def mul(self, r_0):
         size = 2 * self.l ** 2
+        Entry = namedtuple('Entry', 'l m n')
         for a in range(size):
             for b in range(size):
                 l, m, n = self.matrix[a][b]
                 l_new = (l * r_0) % self.order
                 m_new = (m * r_0) % self.order
-                self.matrix[a][b] = self.matrix[a][b]._replace(l=l_new, m=m_new)
+                self.matrix[a][b] = Entry(l_new, m_new, n)
         return self
 
 
