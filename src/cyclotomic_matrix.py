@@ -11,6 +11,15 @@ def power(base: int, exponent: int) -> int:
     return base ** exponent
 
 
+def _is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+
 class CyclotomicMatrix:
     def __init__(self, p: int, l: int, generator: int, k: int):
         """
@@ -19,7 +28,7 @@ class CyclotomicMatrix:
         :param generator: A primitive root of p
         :param k: A positive integer
         """
-        if not self._is_prime(p):
+        if not _is_prime(p):
             raise ValueError("p should be a prime number.")
         if l <= 0 or k <= 0:
             raise ValueError("l and k should be positive integers.")
@@ -32,14 +41,6 @@ class CyclotomicMatrix:
         self.size = self.order
         self.matrix = self._generate()
         self._calc()
-
-    def _is_prime(self, n):
-        if n < 2:
-            return False
-        for i in range(2, int(n ** 0.5) + 1):
-            if n % i == 0:
-                return False
-        return True
 
     def _generate(self) -> np.ndarray:
         """
