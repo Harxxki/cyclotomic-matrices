@@ -44,11 +44,8 @@ def main():
         filename = max(files, key=os.path.getctime)
         p, l, k, generator, cipher_matrix, cipher_str = load_cipher_data(filename)
 
-    if args.r_0:
-        r_0 = args.r_0
-    else:
-        r_0 = random.randint(1, p-1)
-        print(f"r_0 is now determined randomly.: {r_0}")
+    r_0 = args.r_0
+
     if args.p:
         p = args.p
     if args.l:
@@ -62,38 +59,21 @@ def main():
 
     encrypt_generator = generator
     decrypt_generator = pow(encrypt_generator, r_0, p)
-    cm = CyclotomicMatrix(p, l, decrypt_generator, k).mul(args.r_0)._calc()
+    cm = CyclotomicMatrix(p, l, decrypt_generator, k).mul(r_0)._calc()
     cyclotomic_matrix = cm.get(matrix_format="calculated")
     print_matrix(cyclotomic_matrix, "Cyclotomic Matrix")
 
-    mc = MatrixConverter(l)
-    # Check if the matrix is invertible
-    if np.linalg.det(cyclotomic_matrix) == 0:
-        print("cyclotomic matrix is not invertible.")
-    else:
-        print("cyclotomic matrix is invertible.")
-
-    # # 行列の各要素に対してF_p上での逆元を求める ("逆行列"ではない)
-    # inverse_cyclotomic_matrix = np.empty_like(cyclotomic_matrix)
-    # for i in range(cyclotomic_matrix.shape[0]):
-    #     for j in range(cyclotomic_matrix.shape[1]):
-    #         element = int(cyclotomic_matrix[i, j])
-    #         if math.gcd(element, p) == 1:  # Ensure that the element has an inverse modulo p
-    #             inverse_cyclotomic_matrix[i, j] = pow(element, -1, p)
-    #         else:
-    #             print(f"Element {element} at ({i}, {j}) does not have an inverse modulo {p}")
-
-    inverse_cyclotomic_matrix = np.linalg.inv(cyclotomic_matrix)
+    inverse_cyclotomic_matrix = cm.inv()
     print_matrix(inverse_cyclotomic_matrix, "Inverse Cyclotomic Matrix (Z)")
 
-    if args.cipher_str:
-        cypher_matrix = mc.str_to_matrix(args.cipher_str)
-    print_matrix(cypher_matrix, "Cypher Matrix")
+    matrix_converter = MatrixConverter(l)
 
-    message_matrix = inverse_cyclotomic_matrix @ cypher_matrix
+    print_matrix(cipher_matrix, "Cypher Matrix")
+
+    message_matrix = inverse_cyclotomic_matrix @ cipher_matrix
     print_matrix(message_matrix, "Message Matrix")
 
-    message_str = mc.matrix_to_str(message_matrix)
+    message_str = matrix_converter.matrix_to_str(message_matrix)
     print(f"Decrypted Message: {message_str}")
 
 
