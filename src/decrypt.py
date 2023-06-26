@@ -71,6 +71,8 @@ def main():
 
     inverse_cyclotomic_matrix = cm.inv()
     print_matrix(inverse_cyclotomic_matrix, "Inverse Cyclotomic Matrix (Z or D^*)")
+    inverse_cyclotomic_matrix = inverse_cyclotomic_matrix.astype(int)
+    print_matrix(inverse_cyclotomic_matrix, "Int version of it")
 
     matrix_converter = MatrixConverter(l)
 
