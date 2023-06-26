@@ -59,12 +59,18 @@ def main():
 
     encrypt_generator = generator
     decrypt_generator = pow(encrypt_generator, r_0, p)
-    cm = CyclotomicMatrix(p, l, decrypt_generator, k).mul(r_0)._calc()
-    cyclotomic_matrix = cm.get(matrix_format="calculated")
-    print_matrix(cyclotomic_matrix, "Cyclotomic Matrix")
+
+    print("Encrypt Parameters:")
+    print(f"{p=}, {l=}, {k=}, {r_0=}, {encrypt_generator=}, {decrypt_generator=} \n")
+
+    cm = CyclotomicMatrix(p, l, decrypt_generator, k)
+    cyclotomic_matrix_b_0 = cm.get(matrix_format="calculated")
+    print_matrix(cyclotomic_matrix_b_0, "Cyclotomic Matrix B_0")
+    cyclotomic_matrix_d = cm.mul(r_0)._calc().get(matrix_format="calculated")
+    print_matrix(cyclotomic_matrix_d, "Cyclotomic Matrix D (multiplied by r_0 and mod e)")
 
     inverse_cyclotomic_matrix = cm.inv()
-    print_matrix(inverse_cyclotomic_matrix, "Inverse Cyclotomic Matrix (Z)")
+    print_matrix(inverse_cyclotomic_matrix, "Inverse Cyclotomic Matrix (Z or D^*)")
 
     matrix_converter = MatrixConverter(l)
 
@@ -78,4 +84,5 @@ def main():
 
 
 if __name__ == "__main__":
+    print("------ Decrypt ------\n")
     main()
