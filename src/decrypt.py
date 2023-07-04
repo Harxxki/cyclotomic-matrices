@@ -74,7 +74,7 @@ def main():
     inverse_cyclotomic_matrix = inverse_cyclotomic_matrix.astype(int)
     print_matrix(inverse_cyclotomic_matrix, "Int version of it")
 
-    matrix_converter = MatrixConverter(l)
+    matrix_converter = MatrixConverter(l, p)
 
     print_matrix(cipher_matrix, "Cypher Matrix")
 

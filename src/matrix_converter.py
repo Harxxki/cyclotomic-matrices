@@ -1,15 +1,27 @@
 import numpy as np
+import string
 
 
 class MatrixConverter:
-    def __init__(self, l):
+    def __init__(self, l, p):
+        if p > 62:
+            raise ValueError("p cannot exceed 62.")
         self.l = l
+        self.p = p
+        self.char_list = list(string.ascii_lowercase[:p]) + list(
+            string.digits[:max(0, p - 26)]) + list(string.ascii_uppercase[:max(0, p - 36)])
 
     def char_to_int(self, c):
-        return ord(c)
+        try:
+            return self.char_list.index(c)
+        except ValueError:
+            raise ValueError(f"Character {c} not in char_list.")
 
     def int_to_char(self, i):
-        return chr(int(i))
+        try:
+            return self.char_list[i]
+        except IndexError:
+            raise ValueError(f"Index {i} out of range for char_list.")
 
     def str_to_matrix(self, s):
         matrix_size = 2 * self.l ** 2
