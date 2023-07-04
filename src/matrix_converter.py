@@ -4,12 +4,12 @@ import string
 
 class MatrixConverter:
     def __init__(self, l, p):
-        if p > 62:
-            raise ValueError("p cannot exceed 62.")
+        if p > 65:
+            raise ValueError("p cannot exceed 65.")
         self.l = l
         self.p = p
-        self.char_list = list(string.ascii_lowercase[:p]) + list(
-            string.digits[:max(0, p - 26)]) + list(string.ascii_uppercase[:max(0, p - 36)])
+        self.char_list = list(' ,.') + list(string.ascii_lowercase[:p - 3]) + list(
+            string.digits[:max(0, p - 29)]) + list(string.ascii_uppercase[:max(0, p - 39)])
 
     def char_to_int(self, c):
         try:
