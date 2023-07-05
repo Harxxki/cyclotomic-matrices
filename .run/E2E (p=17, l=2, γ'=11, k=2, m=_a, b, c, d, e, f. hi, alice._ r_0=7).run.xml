@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="E2E (p=17, l=2, γ'=11, k=2, m=&quot;Text Message&quot; r_0=7)" type="PythonConfigurationType" factoryName="Python" folderName="End-to-End">
+  <configuration default="false" name="E2E (p=17, l=2, γ'=11, k=2, m=&quot;a, b, c, d, e, f. hi, alice.&quot; r_0=7)" type="PythonConfigurationType" factoryName="Python" folderName="End-to-End">
     <module name="cyclotomic-matries" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />

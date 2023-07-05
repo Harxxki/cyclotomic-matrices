@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ENC (p=17, l=2, γ'=11, k=2, m=&quot;Text Message&quot;)" type="PythonConfigurationType" factoryName="Python" folderName="Encrypt &amp; Decrypt">
+  <configuration default="false" name="ENC (p=17, l=2, γ'=11, k=2, m=&quot;a, b, c, d, e, f. hi, alice.&quot;)" type="PythonConfigurationType" factoryName="Python" folderName="Encrypt &amp; Decrypt">
     <module name="cyclotomic-matries" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -13,7 +13,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/encrypt.py" />
-    <option name="PARAMETERS" value="17 2 11 2 &quot;Text Message&quot;" />
+    <option name="PARAMETERS" value="17 2 11 2 &quot;a, b, c, d, e, f. hi, alice.&quot;" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

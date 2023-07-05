@@ -22,7 +22,7 @@ def encrypt_message(p: int, l: int, generator: int, k: int,
     :return:
     """
     # Convert the message input to a message matrix
-    mc = MatrixConverter(l)
+    mc = MatrixConverter(l, p)
     if isinstance(message_input, str):
         message_matrix = mc.str_to_matrix(message_input)
     elif isinstance(message_input, np.ndarray):
