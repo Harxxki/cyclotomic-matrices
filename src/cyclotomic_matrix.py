@@ -6,6 +6,8 @@ import numpy as np
 from numpy import ndarray
 from numpy.linalg import LinAlgError, inv
 
+from src.inverse_matrix_modulo import matrix_inverse_modulo
+
 
 def power(base: int, exponent: int) -> int:
     return base ** exponent
@@ -136,15 +138,7 @@ class CyclotomicMatrix:
             for b in range(self.size):
                 n_matrix[a][b] = self.matrix[a][b].n
 
-        # 正則行列であることを確認
-        assert np.linalg.det(n_matrix) != 0, "The matrix is not regular."
-
-        # 逆行列を計算
-        try:
-            inv_matrix = inv(n_matrix)
-        except LinAlgError:
-            print("The matrix is not invertible.")
-            return None
+        inv_matrix = matrix_inverse_modulo(n_matrix, self.p)
 
         return inv_matrix
 
