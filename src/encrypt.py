@@ -46,7 +46,9 @@ def encrypt_message(p: int, l: int, generator: int, k: int,
     print_matrix(cipher_matrix, "Cipher Matrix")
 
     # Convert the encrypted matrix to a string
-    cipher_str = mc.matrix_to_str(cipher_matrix)
+    # cipher_str = mc.matrix_to_str(cipher_matrix)
+
+    cipher_str = "hoge"
 
     return cipher_matrix, cipher_str
 

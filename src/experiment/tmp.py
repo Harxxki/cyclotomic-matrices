@@ -1,57 +1,74 @@
 import numpy as np
 import pandas as pd
 
+from src.cyclotomic_matrix import CyclotomicMatrix
+from src.encrypt import encrypt_message
+from src.utils import print_matrix
+
+
+def decrypt_with_mod(_p, _l, _k, _r_0, _generator, _cipher_matrix, _modulo=-1):
+    encrypt_generator = _generator
+    decrypt_generator = pow(encrypt_generator, _r_0, _p)
+
+    print("Encrypt Parameters:")
+    print(f"{_p=}, {_l=}, {_k=}, {_r_0=}, {encrypt_generator=}, {decrypt_generator=} \n")
+
+    cm = CyclotomicMatrix(_p, _l, decrypt_generator, _k)
+    cyclotomic_matrix_b_0 = cm.get(matrix_format="calculated")
+    print_matrix(cyclotomic_matrix_b_0, "Cyclotomic Matrix B_0")
+    cyclotomic_matrix_d = cm.mul(_r_0)._calc().get(matrix_format="calculated")
+    print_matrix(cyclotomic_matrix_d, "Cyclotomic Matrix D (multiplied by r_0 and mod e)")
+
+    inverse_cyclotomic_matrix = cm.inv()
+    if _modulo != -1:
+        inverse_cyclotomic_matrix_mod_p = np.mod(inverse_cyclotomic_matrix, _modulo)
+        print_matrix(inverse_cyclotomic_matrix_mod_p,
+                     "Modulered Inverse Cyclotomic Matrix (Z or D^*)")
+        inverse_cyclotomic_matrix = inverse_cyclotomic_matrix_mod_p.astype(int)
+        print_matrix(inverse_cyclotomic_matrix, "Int version of it")
+    else:
+        print_matrix(inverse_cyclotomic_matrix, "Inverse Cyclotomic Matrix (Z or D^*)")
+        inverse_cyclotomic_matrix = inverse_cyclotomic_matrix.astype(int)
+        print_matrix(inverse_cyclotomic_matrix, "Int version of it")
+
+    print_matrix(_cipher_matrix, "Cypher Matrix")
+
+    decrypted_message_matrix = inverse_cyclotomic_matrix @ _cipher_matrix
+    print_matrix(decrypted_message_matrix, "Message Matrix")
+
+    return decrypted_message_matrix
+
+
 p = 17
 e = 8
 rand = 3
 
-# 行列A (Zをmod pしてそのままMessage Matrixを計算)
-A = np.array([
-    [2039, 1750, 1871, 1833, 32, 77, 101, 115],
-    [115, 97, 103, 101, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1955, 1649, 1751, 1717, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [1955, 1649, 1751, 1717, 0, 0, 0, 0],
-    [1955, 1649, 1751, 1717, 0, 0, 0, 0],
-    [1955, 1649, 1751, 1717, 0, 0, 0, 0]
+l = 2
+generator = 11
+k = 2
+r_0 = 7
+
+message_matrix = np.array([
+    [2, 3, 5, 9, 8, 0, 2, 1],
+    [1, 5, 9, 2, 9, 3, 0, 5],
+    [2, 1, 3, 2, 5, 6, 8, 7],
+    [5, 3, 0, 7, 8, 7, 3, 1],
+    [4, 2, 3, 1, 9, 8, 7, 3],
+    [0, 9, 2, 3, 5, 6, 8, 9],
+    [1, 0, 2, 9, 6, 7, 9, 8],
+    [9, 1, 3, 2, 4, 4, 5, 6]
 ])
 
-# 行列B (Zをmod eしてそのままMessage Matrixを計算)
-B = np.array([
-    [1004, 877, 944, 924, 32, 77, 101, 115],
-    [115, 97, 103, 101, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [920, 776, 824, 808, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [920, 776, 824, 808, 0, 0, 0, 0],
-    [920, 776, 824, 808, 0, 0, 0, 0],
-    [920, 776, 824, 808, 0, 0, 0, 0]
-])
-
-# 行列Rand (Zをmod rand=3してそのままMessage Matrixを計算)
-Rand = np.array([
-    [42, 34, 54, 43, 25, 3, 14, 67],
-    [6, 6, 31, 33, 10, 1, 9, 50],
-    [2, 0, 10, 11, 1, 0, 3, 14],
-    [17, 23, 40, 35, 24, 3, 9, 66],
-    [6, 0, 30, 33, 3, 0, 9, 42],
-    [6, 18, 33, 33, 24, 3, 9, 66],
-    [6, 18, 33, 33, 24, 3, 9, 66],
-    [39, 33, 54, 39, 24, 3, 9, 66],
-])
-
+cipher_matrix, _ = encrypt_message(p, l, generator, k, message_matrix)
+cyclotomic_matrix = CyclotomicMatrix(p, l, generator, k).get(matrix_format="calculated")
 # 正当
-Expected = np.array([
-    [84, 101, 120, 116, 32, 77, 101, 115],
-    [115, 97, 103, 101, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-])
+Expected = decrypt_with_mod(p, l, k, r_0, generator, cipher_matrix)
+# 行列A (Zをmod pしてそのままMessage Matrixを計算)
+A = decrypt_with_mod(p, l, k, r_0, generator, cipher_matrix, p)
+# 行列B (Zをmod eしてそのままMessage Matrixを計算)
+B = decrypt_with_mod(p, l, k, r_0, generator, cipher_matrix, e)
+# 行列Rand (Zをmod rand=3してそのままMessage Matrixを計算)
+Rand = decrypt_with_mod(p, l, k, r_0, generator, cipher_matrix, rand)
 
 # mod p or eを計算
 A_mod_p = np.mod(A, p)
