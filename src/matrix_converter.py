@@ -17,11 +17,14 @@ class MatrixConverter:
         except ValueError:
             raise ValueError(f"Character {c} not in char_list.")
 
-    def int_to_char(self, i):
+    def int_to_char(self, i, modulus):
+        if modulus < 1 or modulus > len(self.char_list):
+            raise ValueError(f"Modulus {modulus} is out of range.")
+        i %= modulus
         try:
             return self.char_list[i]
         except IndexError:
-            raise ValueError(f"Index {i} out of range for char_list.")
+            raise ValueError(f"Unexpected error: index {i} out of range for char_list.")
 
     def str_to_matrix(self, s):
         matrix_size = 2 * self.l ** 2
@@ -36,4 +39,4 @@ class MatrixConverter:
 
     def matrix_to_str(self, matrix):
         flat_list = matrix.flatten().tolist()
-        return ''.join(self.int_to_char(i) for i in flat_list)
+        return ''.join(self.int_to_char(i, self.p) for i in flat_list)
