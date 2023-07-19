@@ -31,11 +31,16 @@ def test_mul():
 
 
 def test_inv():
-    cm = CyclotomicMatrix(p=17, l=2, generator=3, k=2).mul(r_0=7)
+    p = 17
+    l = 2
+    generator = 3
+    k = 2
+    r_0 = 7
+    cm = CyclotomicMatrix(p=p, l=l, generator=generator, k=k).mul(r_0=r_0)
     inv_matrix = cm.inv()
 
-    # D*
-    expected_output = np.array([
+    # D* (Z)
+    expected_output = np.mod(np.array([
         [-1, 1, 1, -1, -1, 1, -1, 1],
         [1, 0, 0, 1, 0, 0, 0, -1],
         [1, 0, 0, 0, 0, 0, 0, 0],
@@ -44,7 +49,7 @@ def test_inv():
         [1, 0, 0, 1, 0, -1, 1, -1],
         [-1, 0, 0, -1, 0, 1, 0, 1],
         [1, -1, 0, 1, 1, -1, 1, -1]
-    ])
+    ]), p)
 
     np.testing.assert_array_equal(inv_matrix, expected_output)
 
