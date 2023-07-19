@@ -3,7 +3,7 @@ import re
 import numpy as np
 import pytest
 
-from src.inverse_matrix_modulo_p import matrix_inverse_modulo_p
+from src.inverse_matrix_modulo import matrix_inverse_modulo
 
 
 # 逆行列が存在する場合のテストケース
@@ -22,8 +22,8 @@ from src.inverse_matrix_modulo_p import matrix_inverse_modulo_p
     # 常に可逆とは限らないので修正した方がいいかも
     (np.random.randint(1, 100, (10, 10)), 97),
 ])
-def test_matrix_inverse_modulo_p(matrix, modulus):
-    inverse_matrix = matrix_inverse_modulo_p(matrix, modulus)
+def test_matrix_inverse_modulo(matrix, modulus):
+    inverse_matrix = matrix_inverse_modulo(matrix, modulus)
     identity_matrix = np.eye(len(matrix), dtype=int)
     assert np.array_equal((np.dot(matrix, inverse_matrix) % modulus), identity_matrix)
 
@@ -42,8 +42,8 @@ def test_matrix_inverse_modulo_p(matrix, modulus):
     (np.array([[11, 22], [2, 4]]), 23),
     (np.ones((10, 10), dtype=int), 97),  # 10x10 matrix with all values 1, modulus is a prime number
 ])
-def test_matrix_inverse_modulo_p_error(matrix, modulus):
+def test_matrix_inverse_modulo_error(matrix, modulus):
     with pytest.raises(ValueError,
                        match=re.escape(
                            "行列は法pにおいて可逆ではありません (Matrix is not invertible modulo p)")):
-        matrix_inverse_modulo_p(matrix, modulus)
+        matrix_inverse_modulo(matrix, modulus)
