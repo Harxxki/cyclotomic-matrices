@@ -122,7 +122,7 @@ class CyclotomicMatrix:
                 self.matrix[a][b] = Entry(l_new, m_new, n)
         return self
 
-    def inv(self) -> ndarray | None:
+    def inv(self) -> ndarray:
         """
         逆行列の計算を行う.
 
