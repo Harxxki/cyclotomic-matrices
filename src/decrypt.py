@@ -81,6 +81,8 @@ def main():
     message_matrix = inverse_cyclotomic_matrix @ cipher_matrix
     print_matrix(message_matrix, "Message Matrix")
 
+    print_matrix(np.mod(message_matrix, p), "Message Matrix (Modulused by p)")
+
     message_str = matrix_converter.matrix_to_str(message_matrix)
     print(f"Decrypted Message: {message_str}")
 
