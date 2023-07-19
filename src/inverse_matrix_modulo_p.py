@@ -19,7 +19,7 @@ def matrix_inverse_modulo_p(matrix, p):
                     augmented_matrix[[i, j]] = augmented_matrix[[j, i]]
                     break
             else:
-                return "行列は法pにおいて可逆ではありません"
+                raise ValueError("行列は法pにおいて可逆ではありません (Matrix is not invertible modulo p)")
         pivot_element = multiplicative_inverse(augmented_matrix[i][i], p)
         augmented_matrix[i] = (augmented_matrix[i] * pivot_element) % p
         for j in range(n):
