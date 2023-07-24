@@ -1,7 +1,14 @@
+import pickle
+
 import sympy
 import random
 import time
+
+import os
+from datetime import datetime
 import matplotlib.pyplot as plt
+
+from src.experiment.plot_results_from_file import plot_results_from_file
 
 
 def is_generator_optimized(g, p):
@@ -49,28 +56,30 @@ def average_time_over_trials(algorithm, trials, p, gamma_prime):
     return total_time / trials
 
 
-def plot_results(p_values, trials):
-    """Plot the average execution time of both algorithms."""
+def save_results(p_values, trials):
+    """Calculate and save the average execution time of both algorithms."""
     times_current = []
     times_proposed = []
+
+    now = datetime.now()
+    now_str = now.strftime("%Y%m%d_%H%M%S")
+    filename = os.path.join('dump', f'results_{now_str}.pkl')
+
     for p in p_values:
         print(f"p = {p}: start")
         gamma_prime = find_generator(p)  # Finding gamma_prime for each p
         times_current.append(average_time_over_trials(find_r_gamma_current, trials, p, gamma_prime))
         times_proposed.append(
             average_time_over_trials(find_r_gamma_proposed, trials, p, gamma_prime))
+        # Save intermediate results
+        with open(filename, 'wb') as f:
+            pickle.dump((p_values[:len(times_current)], times_current, times_proposed), f)
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(p_values, times_current, marker='o', label='Current algorithm')
-    plt.plot(p_values, times_proposed, marker='o', label='Proposed algorithm')
-    plt.title('Average time required to solve DLP vs. p')
-    plt.xlabel('p')
-    plt.ylabel('Average time (seconds)')
-    plt.legend()
-    plt.show()
+    return filename
 
 
 p_values = list(sympy.primerange(2 ** 0,
-                                 2 ** 32))  # Adjust the range of primes depending on your computational power.
+                                 2 ** 5))  # Adjust the range of primes depending on your computational power.
 trials = 10
-plot_results(p_values, trials)
+filename = save_results(p_values, trials)
+plot_results_from_file(filename)
