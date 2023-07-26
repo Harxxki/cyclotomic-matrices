@@ -130,4 +130,4 @@ dmypy.json
 *.code-workspace
 
 .idea/
-src/experiment/dump/
+src/experiment/find_gamma_prime_r0_time/dump/
