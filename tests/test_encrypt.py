@@ -30,7 +30,8 @@ def test_encrypt_message():
         [6, 3, 6, 3, 14, 14, 15, 10]
     ])
 
-    cipher_matrix, _ = encrypt_message(p, l, generator, k, message_matrix)
+    cipher_matrix, _ = encrypt_message(p=p, l=l, public_generator=generator, k=k,
+                                       message_input=message_matrix)
 
     print('\n')
     print_matrix(expected_cipher_matrix, 'Expected Output')

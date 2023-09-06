@@ -5,18 +5,22 @@ import datetime
 import numpy as np
 
 from src.cyclotomic_matrix import CyclotomicMatrix
+from src.find_generators import find_generators
 from src.matrix_converter import MatrixConverter
-from src.utils import print_matrix
+from src.utils import find_public_generator, is_generator, print_matrix
 from typing import Tuple, Union
+import argparse
+import random
 
 
-def encrypt_message(p: int, l: int, generator: int, k: int,
+def encrypt_message(p: int, l: int, public_generator: int, k: int,
                     message_input: Union[str, np.ndarray]) -> Tuple[np.ndarray, str]:
     """
     Encrypt a message using the cyclotomic matrix.
+    :rtype: object
     :param p:
     :param l:
-    :param generator:
+    :param public_generator:
     :param k:
     :param message_input: plaintext or message matrix
     :return:
@@ -33,7 +37,7 @@ def encrypt_message(p: int, l: int, generator: int, k: int,
     print_matrix(message_matrix, "Message Matrix")
 
     # Generate the cyclotomic matrix
-    cm = CyclotomicMatrix(p, l, generator, k)
+    cm = CyclotomicMatrix(p, l, public_generator, k)
     cyclotomic_matrix = cm.get(matrix_format="calculated")
     print_matrix(cyclotomic_matrix, "Cyclotomic Matrix")
     # Check if the matrix is invertible
@@ -51,30 +55,58 @@ def encrypt_message(p: int, l: int, generator: int, k: int,
     return cipher_matrix, cipher_str
 
 
-def save_variables_to_file(p, l, k, generator, cipher_matrix, cipher_str):
+def save_variables_to_file(p: int, l: int, k: int, public_generator: int, private_generator: int,
+                           r_0: int, cipher_matrix, cipher_str):
     # Save the variables to a file
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     with open(f"dist/{timestamp}_cipher_data.pkl", "wb") as f:
-        pickle.dump((p, l, k, generator, cipher_matrix, cipher_str), f)
+        pickle.dump((p, l, k, public_generator, private_generator, r_0, cipher_matrix, cipher_str),
+                    f)
 
 
 def main():
-    if len(sys.argv) < 6:
-        print("Please provide the values of p, l, generator, k, message as command line arguments.")
+    parser = argparse.ArgumentParser(description='Encrypt a message.')
+    parser.add_argument('m', '--message', type=str, help='The message to encrypt.')
+    parser.add_argument('p', '--order', type=int, help='Prime number, Order of F^*_p.')
+    parser.add_argument('l', type=int, help='The parameter l.')
+    parser.add_argument('k', type=int, help='The parameter k.')
+    parser.add_argument('-g', '--private_generator', type=int, help='The private generator.')
+    if len(sys.argv) < 4:
+        print(
+            "[Encrypt] Please provide the values of p, l, k as command line arguments.")
         return
 
-    p = int(sys.argv[1])
-    l = int(sys.argv[2])
-    generator = int(sys.argv[3])
-    k = int(sys.argv[4])
-    message_str = sys.argv[5]
+    args = parser.parse_args()
 
-    cipher_matrix, cipher_str = encrypt_message(p, l, generator, k, message_str)
+    message = args.message
+    p = args.order
+    l = args.l
+    k = args.k
+    if args.private_generator:
+        if not is_generator(args.private_generator, p):
+            raise ValueError("[Encrypt] Provided private generator is not a generator of F_p.")
+        private_generator = args.private_generator
+        print(
+            f"[Encrypt] Using given private generator (gamma double prime) = {args.private_generator}\n")
+    else:
+        private_generator = random.choice(find_generators(p))
+        print(
+            f"[Encrypt] Using random private generator (gamma double prime) = {private_generator}\n")
+
+    public_generator, r_0 = find_public_generator(private_generator, p)
+    print(f"[Encrypt] Generated public generator (gamma prime) = {public_generator}\n")
+    print(f"[Encrypt] Generated r_0 = {r_0}\n")
+    print(
+        f"[Encrypt] All params: {p=}, {l=}, {k=}, {private_generator=}, {public_generator=}, {r_0=}\n")
+
+    cipher_matrix, cipher_str = encrypt_message(p, l, public_generator, k, message)
 
     print_matrix(cipher_matrix, "Cipher Matrix")
-    print(f"Ciphertext: {cipher_str}")
+    print(f"[Encrypt] Ciphertext: {cipher_str}")
 
-    save_variables_to_file(p, l, k, generator, cipher_matrix, cipher_str)
+    save_variables_to_file(p=p, l=l, k=k, public_generator=public_generator,
+                           private_generator=private_generator, r_0=r_0,
+                           cipher_matrix=cipher_matrix, cipher_str=cipher_str)
 
 
 if __name__ == "__main__":

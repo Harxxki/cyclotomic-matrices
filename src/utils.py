@@ -1,5 +1,8 @@
 import numpy as np
+import sympy
+
 from src.find_generators import find_generators
+import random
 
 
 def print_matrix(matrix: np.ndarray, name: str) -> None:
@@ -24,3 +27,21 @@ def secret_key_expansion(p: int, l: int, r_0: int, generator: int):
     # TODO implementation Algorithm 1
     generators = find_generators(p)
     return generators
+
+
+def is_generator(generator: int, p: int) -> bool:
+    """Check if g is a generator of F_p."""
+    for f in sympy.factorint(p - 1):
+        if pow(generator, (p - 1) // f, p) == 1:
+            return False
+    return True
+
+
+def find_public_generator(private_generator: int, p: int) -> tuple:
+    """Find r_0 and gamma_prime (public)"""
+    r_0s = list(range(1, p))
+    random.shuffle(r_0s)
+    for r_0 in r_0s:
+        public_generator = pow(private_generator, r_0, p)
+        if is_generator(public_generator, p):
+            return public_generator, r_0
