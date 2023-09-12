@@ -66,14 +66,14 @@ def save_variables_to_file(p: int, l: int, k: int, public_generator: int, privat
 
 def main():
     parser = argparse.ArgumentParser(description='Encrypt a message.')
-    parser.add_argument('m', '--message', type=str, help='The message to encrypt.')
-    parser.add_argument('p', '--order', type=int, help='Prime number, Order of F^*_p.')
+    parser.add_argument('message', type=str, help='The message to encrypt.')
+    parser.add_argument('order', type=int, help='Prime number, Order of F^*_p.')
     parser.add_argument('l', type=int, help='The parameter l.')
     parser.add_argument('k', type=int, help='The parameter k.')
     parser.add_argument('-g', '--private_generator', type=int, help='The private generator.')
     if len(sys.argv) < 4:
         print(
-            "[Encrypt] Please provide the values of p, l, k as command line arguments.")
+            "[Encrypt] Please provide the values of message, p, l, k as command line arguments.")
         return
 
     args = parser.parse_args()
@@ -87,17 +87,17 @@ def main():
             raise ValueError("[Encrypt] Provided private generator is not a generator of F_p.")
         private_generator = args.private_generator
         print(
-            f"[Encrypt] Using given private generator (gamma double prime) = {args.private_generator}\n")
+            f"[Encrypt] Using given private generator (gamma double prime) = {args.private_generator}")
     else:
         private_generator = random.choice(find_generators(p))
         print(
-            f"[Encrypt] Using random private generator (gamma double prime) = {private_generator}\n")
+            f"[Encrypt] Using random private generator (gamma double prime) = {private_generator}")
 
     public_generator, r_0 = find_public_generator(private_generator, p)
-    print(f"[Encrypt] Generated public generator (gamma prime) = {public_generator}\n")
-    print(f"[Encrypt] Generated r_0 = {r_0}\n")
+    print(f"[Encrypt] Generated public generator (gamma prime) = {public_generator}")
+    print(f"[Encrypt] Generated r_0 = {r_0}")
     print(
-        f"[Encrypt] All params: {p=}, {l=}, {k=}, {private_generator=}, {public_generator=}, {r_0=}\n")
+        f"[Encrypt] All params: {p=}, {l=}, {k=}, {private_generator=}, {public_generator=}, {r_0=}")
 
     cipher_matrix, cipher_str = encrypt_message(p, l, public_generator, k, message)
 
