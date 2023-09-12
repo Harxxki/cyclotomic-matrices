@@ -2,6 +2,8 @@ import sys
 import math
 import argparse
 import random
+from typing import NamedTuple, Optional, Tuple
+
 import numpy as np
 import os
 import glob
@@ -12,61 +14,41 @@ from src.matrix_converter import MatrixConverter
 from utils import print_matrix
 
 
-def load_cipher_data(filename):
-    with open(filename, "rb") as f:
-        p, l, k, generator, cipher_matrix, cipher_str = pickle.load(f)
-    return p, l, k, generator, cipher_matrix, cipher_str
+class SecretKey(NamedTuple):
+    p: int
+    l: int
+    private_generator: int
+    r_0: int
 
 
-def main():
-    parser = argparse.ArgumentParser(description='Decrypt a message.')
-    parser.add_argument('r_0', type=int, help='Random value.')
-    parser.add_argument('-p', type=int, help='The prime number.')
-    parser.add_argument('-l', type=int, help='The parameter l.')
-    parser.add_argument('-k', type=int, help='The parameter k.')
-    parser.add_argument('-g', '--generator', type=int, help='The generator.')
-    parser.add_argument('-d', '--datetime', help='The datetime string in format %Y%m%d_%H%M%S.')
-    parser.add_argument('-s', '--cipher_str', help='The cipher string.')
+class DecryptParameters(NamedTuple):
+    p: int
+    l: int
+    k: int
+    public_generator: Optional[int]
+    secret_key: SecretKey
+    cipher_matrix: Optional[np.ndarray]
+    cipher_str: Optional[str]
 
-    args = parser.parse_args()
+    def __post_init__(self):
+        if self.cipher_matrix is None and self.cipher_str is None:
+            raise ValueError("Either cipher_matrix or cipher_str must be provided.")
+        elif self.cipher_matrix is None and self.cipher_str is not None:
+            mc = MatrixConverter(self.l, self.p)
+            self.cipher_matrix = mc.str_to_matrix(self.cipher_str)
 
-    if args.datetime:
-        filename = f"dist/{args.datetime}_cipher_data.pkl"
-        if not os.path.exists(filename):
-            print(f"Error: No such file '{filename}'")
-            sys.exit(1)
-        p, l, k, generator, cipher_matrix, cipher_str = load_cipher_data(filename)
-    else:
-        files = glob.glob("dist/*_cipher_data.pkl")
-        if not files:
-            print("Error: No cipher data files found in 'dist/' directory.")
-            sys.exit(1)
-        filename = max(files, key=os.path.getctime)
-        p, l, k, generator, cipher_matrix, cipher_str = load_cipher_data(filename)
 
-    r_0 = args.r_0
+def decrypt_message(params: DecryptParameters) -> Tuple[np.ndarray, str]:
+    """
+    Decrypt a message using the cyclotomic matrix.
+    :param params: DecryptParameters
+    :return: decrypted_matrix, decrypted_message
+    """
+    cm = CyclotomicMatrix(params.p, params.l, params.secret_key.private_generator, params.k)
 
-    if args.p:
-        p = args.p
-    if args.l:
-        l = args.l
-    if args.k:
-        k = args.k
-    if args.generator:
-        generator = args.generator
-    if args.cipher_str:
-        cipher_str = args.cipher_str
-
-    encrypt_generator = generator
-    decrypt_generator = pow(encrypt_generator, r_0, p)
-
-    print("Encrypt Parameters:")
-    print(f"{p=}, {l=}, {k=}, {r_0=}, {encrypt_generator=}, {decrypt_generator=} \n")
-
-    cm = CyclotomicMatrix(p, l, decrypt_generator, k)
     cyclotomic_matrix_b_0 = cm.get(matrix_format="calculated")
     print_matrix(cyclotomic_matrix_b_0, "Cyclotomic Matrix B_0")
-    cyclotomic_matrix_d = cm.mul(r_0)._calc().get(matrix_format="calculated")
+    cyclotomic_matrix_d = cm.mul(params.secret_key.r_0)._calc().get(matrix_format="calculated")
     print_matrix(cyclotomic_matrix_d, "Cyclotomic Matrix D (multiplied by r_0 and mod e)")
 
     inverse_cyclotomic_matrix = cm.inv()
@@ -74,17 +56,83 @@ def main():
     inverse_cyclotomic_matrix = inverse_cyclotomic_matrix.astype(int)
     print_matrix(inverse_cyclotomic_matrix, "Int version of it")
 
-    matrix_converter = MatrixConverter(l, p)
+    matrix_converter = MatrixConverter(params.l, params.p)
 
-    print_matrix(cipher_matrix, "Cypher Matrix")
+    decrypted_matrix = inverse_cyclotomic_matrix @ params.cipher_matrix
+    print_matrix(decrypted_matrix, "Decrypted Message Matrix")
 
-    message_matrix = inverse_cyclotomic_matrix @ cipher_matrix
-    print_matrix(message_matrix, "Message Matrix")
+    print_matrix(np.mod(decrypted_matrix, params.p), "Message Matrix (Modulused by p)")
+    decrypted_message = matrix_converter.matrix_to_str(decrypted_matrix)
 
-    print_matrix(np.mod(message_matrix, p), "Message Matrix (Modulused by p)")
+    return decrypted_matrix, decrypted_message
 
-    message_str = matrix_converter.matrix_to_str(message_matrix)
-    print(f"Decrypted Message: {message_str}")
+
+def load_cipher_data(filename):
+    with open(filename, "rb") as f:
+        p, l, k, public_generator, private_generator, r_0, cipher_matrix, cipher_str = pickle.load(
+            f)
+    return p, l, k, public_generator, private_generator, r_0, cipher_matrix, cipher_str
+
+
+def validate_args(args):
+    if args.mode == "dump":
+        # "dump"の場合、他の引数はすべてNoneであることを期待
+        if any([args.p, args.l, args.k, args.public_generator, args.datetime, args.cipher_str,
+                args.private_generator, args.r_0]):
+            raise ValueError('In "dump" mode, other arguments should not be provided.')
+    elif args.mode == "manual":
+        # "manual"の場合、他の引数はすべてNoneでないことを期待
+        if not all([args.p, args.l, args.k, args.public_generator, args.datetime, args.cipher_str,
+                    args.private_generator, args.r_0]):
+            raise ValueError('In "manual" mode, all arguments must be provided.')
+    else:
+        raise ValueError('Invalid mode specified. Please use "dump" or "manual".')
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Decrypt a message.')
+    parser.add_argument('mode', type=str,
+                        help='The mode of the decrypt. "dump": using dump, "manual": using manual input (including secret values).')
+    parser.add_argument('-p', type=int, help='Public value, order of F^*_p.')
+    parser.add_argument('-l', type=int, help='Public parameter l.')
+    parser.add_argument('-k', type=int, help='Public parameter k.')
+    parser.add_argument('--public_generator', type=int, help='Public generator (gamma prime).')
+    parser.add_argument('-d', '--datetime',
+                        help='The datetime string in format %Y%m%d_%H%M%S using for the filename.')
+    parser.add_argument('-c', '--cipher_str', type=str, help='The cipher string.')
+    parser.add_argument('--private_generator', type=int,
+                        help='Secret generator (gamma double prime).')
+    parser.add_argument('-r_0', type=int, help='Secret value r_0.')
+
+    args = parser.parse_args()
+    validate_args(args)
+
+    if args.mode == "dump":
+        if args.datetime:
+            filename = f"dist/{args.datetime}_cipher_data.pkl"
+            if not os.path.exists(filename):
+                raise FileNotFoundError(f"Error: No such file '{filename}'")
+            p, l, k, public_generator, private_generator, r_0, cipher_matrix, cipher_str = load_cipher_data(
+                filename)
+        else:  # datetimeが指定されていない場合、最新のファイルを読み込む
+            files = glob.glob("dist/*_cipher_data.pkl")
+            if not files:
+                print("Error: No cipher data files found in 'dist/' directory.")
+                sys.exit(1)
+            filename = max(files, key=os.path.getctime)
+            p, l, k, public_generator, private_generator, r_0, cipher_matrix, cipher_str = load_cipher_data(
+                filename)
+        secret_key = SecretKey(p, l, private_generator, r_0)
+        params = DecryptParameters(p, l, k, public_generator, secret_key, cipher_matrix, cipher_str)
+    else:  # args.mode == "manual"
+        secret_key = SecretKey(args.p, args.l, args.private_generator, args.r_0)
+        params = DecryptParameters(args.p, args.l, args.k, args.public_generator, secret_key, None,
+                                   args.cipher_str)
+
+    print(f"[Decrypt] Decrypt Parameters: {params}")
+
+    decrypted_matrix, decrypted_message = decrypt_message(params)
+    print(f"[Decrypt] Decrypted Message: {decrypted_message}")
 
 
 if __name__ == "__main__":
