@@ -92,3 +92,5 @@ typing-extensions==4.0.1
     # via
     #   black
     #   mypy
+sympy
+pytest-mock
