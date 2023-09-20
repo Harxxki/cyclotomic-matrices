@@ -1,14 +1,15 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="DEC (mode=&quot;dump&quot;)" type="PythonConfigurationType" factoryName="Python" folderName="Encrypt &amp; Decrypt">
+  <configuration default="false" name="E2E (m=&quot;a, b, c, d, e, f. hi, alice.&quot;, p=17, l=2, k=5)" type="PythonConfigurationType" factoryName="Python" folderName="End-to-End">
     <module name="cyclotomic-matries" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
     </envs>
-    <option name="SDK_HOME" value="" />
+    <option name="SDK_HOME" value="$USER_HOME$/.asdf/shims/python" />
+    <option name="SDK_NAME" value="Python 3.10" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="IS_MODULE_SDK" value="true" />
+    <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -19,6 +20,8 @@
     <option name="MODULE_MODE" value="false" />
     <option name="REDIRECT_INPUT" value="false" />
     <option name="INPUT_FILE" value="" />
-    <method v="2" />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Enc (m=&quot;a, b, c, d, e, f. hi, alice.&quot;, p=41, l=2, k=5)" run_configuration_type="PythonConfigurationType" />
+    </method>
   </configuration>
 </component>

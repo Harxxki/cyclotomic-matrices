@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="CM Demo (p=41, l=2, γ=6, k=5)" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="Enc (m=&quot;a, b, c, d, e, f. hi, alice.&quot;, p=41, l=2, k=5)" type="PythonConfigurationType" factoryName="Python" folderName="Encrypt and Decrypt">
     <module name="cyclotomic-matries" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -12,8 +12,8 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/cyclotomic_matrix.py" />
-    <option name="PARAMETERS" value="41 2 6 5" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/encrypt.py" />
+    <option name="PARAMETERS" value="&quot;a, b, c, d, e, f. hi, alice.&quot; 41 2 5" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />
