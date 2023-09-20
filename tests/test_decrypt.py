@@ -90,26 +90,37 @@ def test_validate_args():
 
 
 def test_main_dump_mode(tmp_path, mocker, capsys):
-    data = (1, 1, 1, 1, 1, 1, None, "test")
+    data = (
+        41, 2, 5, 17, 30, 31, None,
+        "vtxmm.a1c,hm. fmndoo. fmice.    .diif,atndoo. fmae,bf,cg d, e, f")
     file_path = tmp_path / "test_cipher_data.pkl"
 
     with open(file_path, "wb") as f:
         pickle.dump(data, f)
 
-    mocker.patch('sys.argv', ['script_name', 'dump', '--datetime', 'test'])
+    mocker.patch('sys.argv', ['script_name', 'dump'])
+
+    # Mock the glob.glob to return the test file path
+    mocker.patch('glob.glob', return_value=[file_path])
+
+    # Mock os.path.exists to always return True
+    mocker.patch('os.path.exists', return_value=True)
+
     main()
     captured = capsys.readouterr()
 
     assert "Decrypted Message:" in captured.out
+    assert "a, b, c, d, e, f. hi, alice." in captured.out
 
 
 def test_main_manual_mode(mocker, capsys):
     # Mock command line arguments for manual mode
-    mocker.patch('sys.argv', ['script_name', 'manual', '-p', '1', '-l', '2', '-k', '3',
-                              '--public_generator', '4', '-d', 'test', '-c', 'test_cipher',
-                              '--private_generator', '5', '-r_0', '6'])
+    mocker.patch('sys.argv', ['script_name', 'manual', '-p', '41', '-l', '2', '-k', '5',
+                              '--public_generator', '17', '-c',
+                              'vtxmm.a1c,hm. fmndoo. fmice.    .diif,atndoo. fmae,bf,cg d, e, f',
+                              '--private_generator', '30', '-r_0', '31'])
     main()
     captured = capsys.readouterr()
 
     assert "Decrypted Message:" in captured.out
-    # replace with the actual expected message
+    assert "a, b, c, d, e, f. hi, alice." in captured.out

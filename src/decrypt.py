@@ -73,13 +73,13 @@ def load_cipher_data(filename):
 
 def validate_args(args):
     if args.mode == "dump":
-        # "dump"の場合、他の引数はすべてNoneであることを期待
-        if any([args.p, args.l, args.k, args.public_generator, args.datetime, args.cipher_str,
+        # "dump"の場合、--datetime以外の引数はすべてNoneであることを期待
+        if any([args.p, args.l, args.k, args.public_generator, args.cipher_str,
                 args.private_generator, args.r_0]):
             raise ValueError('In "dump" mode, other arguments should not be provided.')
     elif args.mode == "manual":
-        # "manual"の場合、他の引数はすべてNoneでないことを期待
-        if not all([args.p, args.l, args.k, args.public_generator, args.datetime, args.cipher_str,
+        # "manual"の場合、--datetime以外の引数はすべてNoneでないことを期待
+        if not all([args.p, args.l, args.k, args.public_generator, args.cipher_str,
                     args.private_generator, args.r_0]):
             raise ValueError('In "manual" mode, all arguments must be provided.')
     else:
