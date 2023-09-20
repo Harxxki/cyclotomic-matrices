@@ -1,17 +1,14 @@
 import sys
-import math
 import argparse
-import random
 from typing import NamedTuple, Optional, Tuple
 
 import numpy as np
 import os
 import glob
 import pickle
-from find_generators import find_generators
 from src.cyclotomic_matrix import CyclotomicMatrix
 from src.matrix_converter import MatrixConverter
-from utils import print_matrix
+from src.utils import print_matrix
 
 
 class SecretKey(NamedTuple):
@@ -21,16 +18,16 @@ class SecretKey(NamedTuple):
     r_0: int
 
 
-class DecryptParameters(NamedTuple):
-    p: int
-    l: int
-    k: int
-    public_generator: Optional[int]
-    secret_key: SecretKey
-    cipher_matrix: Optional[np.ndarray]
-    cipher_str: Optional[str]
+class DecryptParameters:
+    def __init__(self, p, l, k, public_generator, secret_key, cipher_matrix=None, cipher_str=None):
+        self.p = p
+        self.l = l
+        self.k = k
+        self.public_generator = public_generator
+        self.secret_key = secret_key
+        self.cipher_matrix = cipher_matrix
+        self.cipher_str = cipher_str
 
-    def __post_init__(self):
         if self.cipher_matrix is None and self.cipher_str is None:
             raise ValueError("Either cipher_matrix or cipher_str must be provided.")
         elif self.cipher_matrix is None and self.cipher_str is not None:

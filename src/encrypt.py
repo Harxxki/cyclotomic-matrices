@@ -7,7 +7,7 @@ import numpy as np
 from src.cyclotomic_matrix import CyclotomicMatrix
 from src.find_generators import find_generators
 from src.matrix_converter import MatrixConverter
-from src.utils import find_public_generator, is_generator, print_matrix
+from src.utils import find_public_generator, is_generator, is_prime, print_matrix
 from typing import Tuple, Union
 import argparse
 import random
@@ -77,6 +77,9 @@ def main():
         return
 
     args = parser.parse_args()
+
+    if not is_prime(args.order):
+        raise ValueError("[Encrypt] Order should be prime number.")
 
     message = args.message
     p = args.order

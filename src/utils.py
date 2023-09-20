@@ -45,3 +45,7 @@ def find_public_generator(private_generator: int, p: int) -> tuple:
         public_generator = pow(private_generator, r_0, p)
         if is_generator(public_generator, p):
             return public_generator, r_0
+
+
+def is_prime(p: int) -> bool:
+    return sympy.isprime(p)
