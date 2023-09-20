@@ -1,54 +1,100 @@
 # Cyclotomic Matrices
 
-An implementation of the algorithm described in the paper [A Public Key Cryptosystem Using Cyclotomic Matrices](https://www.researchgate.net/publication/356720825_A_Public_Key_Cryptosystem_Using_Cyclotomic_Matrices)[^1].
+An implementation of the algorithm described in the
+paper [A Public Key Cryptosystem Using Cyclotomic Matrices](https://www.researchgate.net/publication/356720825_A_Public_Key_Cryptosystem_Using_Cyclotomic_Matrices).
 
-[^1]:
-    Md. Helal Ahmed, Jagmohan Tanti, and Sumant Pushp,
-    A Public Key Cryptosystem Using Cyclotomic Matrices,
-    Coding Theory - Recent Advances, New Perspectives and Applications,
-    June 2019.
-    Also available at https://www.researchgate.net/publication/356720825_A_Public_Key_Cryptosystem_Using_Cyclotomic_Matrices.
+## Using `encrypt.py`
 
-
-
-## Using `decrypt.py`
-
-The `decrypt.py` script is a command-line utility that allows you to decrypt a message that was encrypted using the `encrypt.py` script. The script requires various parameters that can be either provided as command line arguments or retrieved from a previous run of the `encrypt.py` script, stored in a pickle dump file.
+The `encrypt.py` script is a command-line utility that allows you to encrypt a message. The script requires various
+parameters that can be either provided as command line arguments.
 
 ### Required Arguments
 
-- `r_0`: This is a required argument for decryption. It is a number used during the multiplication operation in the decryption process.
+- `message`: The message you want to encrypt.
+- `order`: Prime number, Order of \(F^*_p\).
+- `l`: The parameter \(l\).
+- `k`: The parameter \(k\).
 
 ### Optional Arguments
 
-- `p`, `l`, `k`, `generator`: These are optional parameters that were used during the encryption process. If not specified, they will be loaded from the latest pickle dump file available.
-
-- `datetime`: This option can be used to specify a particular pickle dump file from which to load parameters. The date and time should be in the format "YYYYMMDD_HHMMSS". If this option is not used, parameters will be loaded from the latest pickle dump file.
-
-- `cipher_str`: The encrypted message string. If not specified, the string will be loaded from the same pickle dump file the other parameters are loaded from.
+- `-g`, `--private_generator`: The private generator. If not specified, a random generator will be chosen.
 
 ### Usage Examples
 
 1. **Providing all arguments:**
+
 ```bash
-python decrypt.py 10 -p 3 -l 2 -k 1 -g 2 -d 20230530_124512 -s "encrypted string"
+python encrypt.py "Your Message Here" 41 2 5 -g 2
 ```
-In this example, `r_0` is 10 and `p`=3, `l`=2, `k`=1, `generator`=2, `datetime`="20230530_124512", `cipher_str`="encrypted string" are provided as arguments. Decryption will proceed using these specific parameters.
 
-2. **Providing some arguments:**
+In this example, the message "Your Message Here" will be encrypted using `order`=41, `l`=2, `k`=5,
+and `private_generator`=2.
+
+2. **Providing only the required arguments:**
+
 ```bash
-python decrypt.py 10 -p 3 -l 2
+python encrypt.py "Your Message Here" 41 2 5
 ```
-In this example, `r_0` is 10 and `p`=3, `l`=2 are provided as arguments. `k`, `generator`, `datetime`, and `cipher_str` will be loaded from the latest available pickle dump file.
 
-3. **Providing only the required argument:**
+In this example, the message "Your Message Here" will be encrypted using `order`=41, `l`=2, and `k`=5. A
+random `private_generator` will be chosen.
+
+The `encrypt.py` script will display the encrypted message, the cipher matrix, and other relevant parameters. It will
+also save these parameters to a file for later use in decryption.
+
+## Using `decrypt.py`
+
+The `decrypt.py` script is a command-line utility that allows you to decrypt a message that was encrypted using
+the `encrypt.py` script. The script requires various parameters that can be either provided as command line arguments or
+retrieved from a previous run of the `encrypt.py` script, stored in a pickle dump file.
+
+### Required Arguments
+
+- `mode`: The mode of decryption. It can be either "dump" (using a dump file) or "manual" (providing all the necessary
+  parameters manually).
+
+### Optional Arguments
+
+- `-p`: Public value, order of \(F^*_p\).
+- `-l`: Public parameter \(l\).
+- `-k`: Public parameter \(k\).
+- `--public_generator`: Public generator (gamma prime).
+- `-d`, `--datetime`: The datetime string in format `%Y%m%d_%H%M%S` used for the filename. This is used to specify a
+  particular pickle dump file from which to load parameters.
+- `-c`, `--cipher_str`: The encrypted message string.
+- `--private_generator`: Secret generator (gamma double prime).
+- `-r_0`: Secret value \(r_0\).
+
+### Usage Examples
+
+1. **Using dump mode:**
+
 ```bash
-python decrypt.py 10
+python decrypt.py dump
 ```
-In this example, only `r_0` is provided. All other parameters (`p`, `l`, `k`, `generator`, `datetime`, `cipher_str`) will be loaded from the latest available pickle dump file.
 
-The `decrypt.py` script allows for flexible combination of parameters, enabling decryption operations based on the specific requirements of your use case.
+In this example, the script will automatically load the necessary parameters from the latest available pickle dump file
+and proceed with the decryption.
 
+2. **Using dump mode with a specific datetime:**
+
+```bash
+python decrypt.py dump -d 20230530_124512
+```
+
+In this example, the script will load the necessary parameters from the specified pickle dump file and proceed with the
+decryption.
+
+3. **Using manual mode:**
+
+```bash
+python decrypt.py manual -p 41 -l 2 -k 5 --public_generator 17 -c "encrypted string" --private_generator 30 -r_0 31
+```
+
+In this example, all the necessary parameters are provided manually, and the script will proceed with the decryption
+using these specific parameters.
+
+The `decrypt.py` script will display the decrypted message, the decrypted matrix, and other relevant matrices.
 
 ## Author
 
